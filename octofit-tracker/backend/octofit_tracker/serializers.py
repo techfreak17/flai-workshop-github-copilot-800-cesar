@@ -9,15 +9,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    members_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Team
         fields = ['id', 'name', 'description', 'total_points', 'members_count', 'created_at', 'updated_at']
+    
+    def get_members_count(self, obj):
+        return User.objects.filter(team=obj.name).count()
 
 
 class ActivitySerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    
     class Meta:
         model = Activity
-        fields = ['id', 'user', 'activity_type', 'duration_minutes', 'distance_km', 'calories_burned', 'points_earned', 'date', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'user_name', 'activity_type', 'duration_minutes', 'distance_km', 'calories_burned', 'points_earned', 'date', 'created_at', 'updated_at']
 
 
 class LeaderboardSerializer(serializers.ModelSerializer):
